@@ -134,6 +134,41 @@ select custid, COUNT(*) AS 도서수량, SUM(saleprice) AS 총액 from orders gr
 group by는 특정 컬럼을 기준으로 데이터를 그룹화하여 집계함수를 적용할 때 사용한다. group by 뒤에는 그룹화할 컬럼이 오며, 집계함수는 그룹화된 데이터에 대해 계산된다. group by를 사용하면 각 그룹별로 집계된 결과를 얻을 수 있다.
 
 가격이 8000원 이상인 도서를 구매한 고객에 대해 고객별 주문 도서의 총수량을 조회하고 총수량이 2이상인 고객만 조회.  
-select custid, COUNT(*) AS 도서수량 from orders where saleprice >= 8000 group by custid having COUNT(*) >= 2;  
+select custid, COUNT(*) AS 도서수량  
+from orders  
+where saleprice >= 8000  
+group by custid  
+having COUNT(*) >= 2;  
 
+having 절은 group by 절과 함께 사용  
 
+### join 조인  
+
+select *
+from customer, orders; 이렇게 조건없이 작성하면 모든 경우의 수 가 나온다.  
+
+select *
+from customer, orders
+where customer.custid = orders.custid; 조건을 추가한 쿼리. custid가 같은 경우에만 조인된다.  
+
+select *
+from customer, orders
+where customer.custid = orders.custid
+order by customer.custid; order by 를 사용해 고객별로 정렬.  
+
+select name, saleprice
+from customer, orders
+where customer.custid = orders.custid; where 절을 사용하여 정렬.  
+
+고객별로 주문한 모든 도서의 총판매액을 구하고, 고객별로 정렬.
+select name, SUM(saleprice)
+from customer, orders
+where customer.custid = orders.custid
+group by customer.name
+order by customer.name;  
+
+self join은 자기 자신과 조인하는 경우에 사용한다. 
+select a.name AS 고객명, b.name AS 도서명
+from orders orders
+JOIN customer a ON orders.custid = a.custid
+JOIN book b ON orders.bookid = b.bookid;  셀프 조인 예시. orders 테이블을 두 번 조인하여 고객명과 도서명을 조회한다. orders 테이블을 a와 b로 각각 조인하여 고객명과 도서명을 가져온다.   
