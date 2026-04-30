@@ -447,7 +447,107 @@ select orderid as 주문번호, (b.price - o.saleprice) as 차이
 from orders o join book b 
 on o.bookid = b.bookid
 where (b.price - o.saleprice) = (select max(b2.price - o2.saleprice) from orders o2 join book b2 on b2.bookid = o2.bookid);
+```
+
+### 2026-04-30
+
+#### 삽입  
+
+insert into book (bookid, bookname, publisher)
+        values(14, '스포츠의학', '한솔의학서적');
+
+insert into book (bookid, bookname, publisher)
+        values(15, '스포츠의학3', '한솔의학서적'),
+        values(16, '스포츠의학4', '한솔의학서적');
+
+#### 수정  
+
+customer 테이블에서 고객번호가 5인 고객의 주소를 대한민국 대전으로 변경.
+
+```sql
+SET SQL_SAFE_UPDATES = 0; --safe updates 옵션 미 해제시 실행.
+UPDATE customer
+SET address = '대한민국 대전'
+WHERE custid = 5;  
+
+
+박세리의 주소를 세종으로 변경. 
+        update customer
+    -> set address = '세종특별자치시'
+    -> where custid =5;
+```
+
+#### 삭제
+
+```sql
+delete from book 
+where bookid = 11; 
+```  
+
+cascade 옵션이 설정된 경우, 부모 테이블에서 행이 삭제되면 해당 행과 관련된 자식 테이블의 행도 자동으로 삭제된다. 예를 들어, Orders 테이블에서 특정 고객의 주문이 삭제되면, 해당 고객과 관련된 모든 주문도 함께 삭제된다. cascade 옵션은 데이터 무결성을 유지하는 데 도움이 되며, 부모-자식 관계가 있는 테이블에서 유용하게 사용된다.
 
 
 
+```sql
+create table NewBook (
+    bookid int primary key,
+    bookname varchar(40),
+    publisher varchar(40),
+    price int
+);
+```
+```sql
+create table NewOrders (
+    orderid int primary key,
+    custid int ,
+    bookid int ,
+    saleprice int,
+    orderdate date,
+    foreign key (custid) references customer(custid) on delete cascade, 
+    foreign key (bookid) references book(bookid) on delete cascade
+);
+```
 
+```sql  
+
+alter table new book add isbn varchar(13); -- alter table은 테이블 구조를 변경하는 명령어로, 컬럼 추가, 삭제, 수정 등을 수행할 수 있다. 위의 예시에서는 new book 테이블에 isbn이라는 새로운 컬럼을 추가하는 쿼리이다.
+alter table newbook modify isbn int; 
+
+alter table newbook drop column isbn; 
+
+alter table newbook modify isbn interger not null;  
+
+alter table newbook add primary key (bookid); 
+```
+
+#### 뷰
+뷰는 하나 이상의 테이블에서 데이터를 조회하여 가상의 테이블을 생성하는 데이터베이스 객체이다. 뷰는 실제 데이터를 저장하지 않고, 정의된 쿼리를 실행하여 결과를 반환한다. 뷰는 복잡한 쿼리를 단순화하고, 보안을 강화하며, 데이터의 일관성을 유지하는 데 사용된다. 뷰를 사용하면 사용자에게 필요한 데이터만 제공할 수 있으며, 원본 테이블의 구조를 변경하지 않고도 데이터를 조회할 수 있다.
+
+```sql
+create view V_orders 
+as select orderid, O.custid, name, O.bookid, bookname, saleprice, orderdate 
+from orders O, customer C, book B 
+where O.custid = C.custid and O.bookid = B.bookid; 
+
+
+select * from v_orders;
+```
+
+### 아나콘다
+
+conda env list : 현재 설치된 가상환경 목록을 보여준다.
+
+conda create -n iot1 python=3.12 : iot1이라는 이름의 가상환경을 생성하고, 해당 환경에 Python 3.12 버전을 설치한다. 
+
+conda activate iot1 : iot1이라는 가상환경을 활성화한다.
+
+conda install jupyter notebook : 현재 활성화된 가상환경에 Jupyter Notebook을 설치한다. pip 에서설치해도됨.
+
+주피터 노트북 코드 폴더 설정.  
+cd 파일경로.  
+>jupyter notebook  
+
+실행후 브라우저가 열리지않으면 수동으로 복사해서 브라우저에 붙여넣기.  
+
+파이썬 프로그램 단독 실행 
+python 파일명.py 
